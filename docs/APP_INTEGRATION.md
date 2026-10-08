@@ -20,7 +20,7 @@ https://{owner}.github.io/{repo}/layouts-manifest.json
 
 For this repository:
 ```
-https://palsoftware.github.io/pastiera-dict/layouts-manifest.json
+https://pkb.rocks/plektra-dict/layouts-manifest.json
 ```
 
 ## Manifest Structure
@@ -122,7 +122,7 @@ class LayoutManifestService(
     private val httpClient: OkHttpClient,
     private val gson: Gson
 ) {
-    private val manifestUrl = "https://palsoftware.github.io/pastiera-dict/layouts-manifest.json"
+    private val manifestUrl = "https://pkb.rocks/plektra-dict/layouts-manifest.json"
     
     suspend fun fetchManifest(): Result<LayoutsManifest> = withContext(Dispatchers.IO) {
         try {

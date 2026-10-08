@@ -1,16 +1,16 @@
-# pastiera-dict
+# plektra-dict
 
-Asset repository for Pastiera dictionaries (`.dict`) and downloadable keyboard layouts (`.json`).
+Asset repository for Plektra dictionaries (`.dict`) and downloadable keyboard layouts (`.json`).
 
-This repo is the companion to the main app repo (`palsoftware/pastiera`) and is used to keep APK size under control by distributing large assets separately through GitHub Releases + GitHub Pages manifests.
+This repo is the companion to the main app repo (`pkb-rocks/plektra`) and is used to keep APK size under control by distributing large assets separately through GitHub Releases + GitHub Pages manifests.
 
 ## Repository Roles
 
-- `palsoftware/pastiera`
+- `pkb-rocks/plektra`
   - App source code
   - Bundled/default assets used directly in the APK
   - Locale integration (`method.xml`, `strings.xml`, `locale_layout_mapping.json`)
-- `palsoftware/pastiera-dict` (this repo)
+- `pkb-rocks/plektra-dict` (this repo)
   - Release-distributed dictionaries (`dicts/*.dict`)
   - Release-distributed layouts (`layouts/*.json`)
   - Manifests served via GitHub Pages (`docs/*.json`)
@@ -74,7 +74,7 @@ License:
 
 ## Cross-Repo Workflow (Practical)
 
-### 1. Add language support in `pastiera`
+### 1. Add language support in `plektra`
 
 In the app repo:
 
@@ -92,7 +92,7 @@ Notes:
   - locale-specific characters can unintentionally affect other languages
 - Prefer putting language-specific reachability into the layout (multi-tap) where possible.
 
-### 2. Move downloadable assets into `pastiera-dict`
+### 2. Move downloadable assets into `plektra-dict`
 
 In this repo:
 
@@ -108,7 +108,7 @@ Notes:
 - `docs/dicts-manifest.json` and `docs/layouts-manifest.json` are generated from releases.
 - Manual edits to manifests should be rare (e.g. typo correction) and ideally followed by the next automated release update.
 
-### 3. Publish release in `pastiera-dict`
+### 3. Publish release in `plektra-dict`
 
 - create a GitHub Release
 - upload the new `.dict` / `.json` assets
@@ -125,6 +125,27 @@ These manifests are consumed by the app via GitHub Pages.
 
 - layout JSON parses and contains `name` / `description`
 - no empty or invalid multi-tap entries
-- locale integrations in `pastiera` keep existing locales intact (merge conflicts often happen here)
+- locale integrations in `plektra` keep existing locales intact (merge conflicts often happen here)
 - translation files have valid format placeholders (`%1$s`, `%1$d`, etc.)
 - `dicts-metadata.json` contains metadata for any new dictionary IDs
+
+## Initial Plektra release
+
+The first release, `v1`, contains all 19 dictionaries and the 16 layouts in the
+last upstream manifests. Assets are copied byte for byte from Pastiera's
+published releases and checked against their original SHA-256 and byte count.
+IDs, language tags and display metadata stay unchanged. The upstream history,
+README, license and manifest snapshots preserve attribution and provenance.
+
+```sh
+python3 prepare_initial_release.py --output .local-work/releases/v1
+```
+
+This only creates local files. It does not create a GitHub repository, tag,
+release or Pages deployment. See [Plektra release preparation](docs/PLEKTRA_RELEASE.md)
+for the publication order and checks.
+
+Canonical app manifests:
+
+- `https://pkb.rocks/plektra-dict/dicts-manifest.json`
+- `https://pkb.rocks/plektra-dict/layouts-manifest.json`

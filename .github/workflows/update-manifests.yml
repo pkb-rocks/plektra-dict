@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
+      pages: write
     
     steps:
       - name: Checkout repository
@@ -83,4 +83,6 @@ jobs:
             }});
             if (!result.createCommitOnBranch.commit.signature?.isValid) {
               core.setFailed('GitHub did not verify the manifest commit signature');
+              return;
             }
+            await github.rest.repos.requestPagesBuild(context.repo);

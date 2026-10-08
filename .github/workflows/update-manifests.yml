@@ -30,9 +30,11 @@ jobs:
           fetch-depth: 0
       
       - name: Ensure latest version
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          git fetch origin ${{ github.event.repository.default_branch }}
-          git reset --hard origin/${{ github.event.repository.default_branch }}
+          git fetch origin "$DEFAULT_BRANCH"
+          git reset --hard "origin/$DEFAULT_BRANCH"
       
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,22 +44,21 @@ jobs:
       - name: Run manifest updater
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.release_tag }}
+          TAG_PATTERN: ${{ github.event.inputs.tag_pattern }}
         run: |
-          RELEASE_TAG="${{ github.event.release.tag_name || github.event.inputs.release_tag }}"
-          TAG_PATTERN="${{ github.event.inputs.tag_pattern }}"
-          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
-          
-          CMD="python3 update_manifests.py --owner ${{ github.repository_owner }} --repo $REPO_NAME"
-          
+          args=(--owner "$GITHUB_REPOSITORY_OWNER" --repo "${GITHUB_REPOSITORY#*/}")
           if [ -n "$RELEASE_TAG" ]; then
-            CMD="$CMD --release-tag $RELEASE_TAG"
+            args+=(--release-tag "$RELEASE_TAG")
           elif [ -n "$TAG_PATTERN" ]; then
-            CMD="$CMD --tag-pattern $TAG_PATTERN"
+            args+=(--tag-pattern "$TAG_PATTERN")
           fi
-          
-          $CMD
-      
+          python3 update_manifests.py "${args[@]}"
+
       - name: Commit and push changes
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.release_tag || 'latest' }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -65,7 +66,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            RELEASE_TAG="${{ github.event.release.tag_name || github.event.inputs.release_tag || 'latest' }}"
             git commit -m "chore: update manifests from release $RELEASE_TAG"
-            git push origin ${{ github.event.repository.default_branch }}
+            git push origin "$DEFAULT_BRANCH"
           fi

@@ -75,7 +75,7 @@ jobs:
               createCommitOnBranch(input: $input) { commit { oid signature { isValid } } }
             }`, { input: {
               branch: { repositoryNameWithOwner: process.env.GITHUB_REPOSITORY,
-                refName: process.env.DEFAULT_BRANCH },
+                branchName: process.env.DEFAULT_BRANCH },
               expectedHeadOid: head.stdout.trim(),
               message: { headline: `chore: update manifests from release ${process.env.RELEASE_TAG}` },
               fileChanges: { additions: paths.map(path => ({ path,
